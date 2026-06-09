@@ -37,6 +37,11 @@ The guiding principle: behave as if VS Code natively supported these features.
 6. **Liquibase file-reference navigation** — Ctrl/Cmd-click the path in
    `<include file>`, `<includeAll path>`, `<sqlFile path>` to open the
    referenced file/directory.
+7. **`@Qualifier` bean navigation** — Ctrl/Cmd-click the name in
+   `@Qualifier("bean")` to jump to the bean (reuses `BeanIndex`).
+8. **Spring Batch job-parameter navigation** — Ctrl/Cmd-click a key in
+   `@Value("#{jobParameters['KEY']}")` to jump to where it is set via a
+   `JobParametersBuilder.addX("KEY", …)` call (`JobParameterIndex`).
 
 ## 3. Tech stack & key decisions
 
@@ -82,6 +87,10 @@ src/
     liquibaseCodeLens.ts             "Execute SQL Block" CodeLens
     fileReferenceResolver.ts         findFileReferenceAtOffset, resolveReferencePaths (pure)
     liquibaseFileDefinitionProvider.ts  file-reference DefinitionProvider
+  spring-beans/
+    qualifierDefinitionProvider.ts   extractQualifierBeanAt (pure) + provider (uses BeanIndex)
+    jobParameterIndex.ts             detectJobParameterDefinitions (pure) + JobParameterIndex
+    jobParameterDefinitionProvider.ts  extractJobParameterKeyAt (pure) + provider
   test/
     unit/*.test.ts                   Mocha unit tests (one per module)
     integration/extension.test.ts    @vscode/test-electron tests

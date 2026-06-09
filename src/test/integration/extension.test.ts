@@ -65,4 +65,43 @@ describe("Integration", () => {
       `expected child.xml, got ${targetPath}`
     );
   });
+
+  it("navigates @Qualifier to the bean definition", async () => {
+    const doc = await openFixture("src/BatchConfig.java");
+    const text = doc.getText();
+    const offset = text.indexOf('@Qualifier("tamTkg46NeLiItemWriter")') +
+      '@Qualifier("'.length + 3;
+    const pos = doc.positionAt(offset);
+    const defs = (await vscode.commands.executeCommand(
+      "vscode.executeDefinitionProvider",
+      doc.uri,
+      pos
+    )) as (vscode.Location | vscode.LocationLink)[];
+    assert.ok(defs && defs.length >= 1, "expected a definition for @Qualifier");
+    const first = defs[0] as vscode.Location & vscode.LocationLink;
+    const targetPath = (first.targetUri ?? first.uri).fsPath;
+    assert.ok(targetPath.endsWith("BatchConfig.java"), targetPath);
+  });
+
+  it("navigates jobParameters['KEY'] to where it is set", async () => {
+    const doc = await openFixture("src/BatchConfig.java");
+    const text = doc.getText();
+    // The @Value reference (second occurrence), not the addString definition.
+    const valueRef = text.indexOf(
+      "#{jobParameters['MQ_MESSAGE_INCOMING.ID']}"
+    );
+    const offset = text.indexOf("MQ_MESSAGE_INCOMING.ID", valueRef);
+    const pos = doc.positionAt(offset);
+    const defs = (await vscode.commands.executeCommand(
+      "vscode.executeDefinitionProvider",
+      doc.uri,
+      pos
+    )) as (vscode.Location | vscode.LocationLink)[];
+    assert.ok(defs && defs.length >= 1, "expected a job-parameter definition");
+    const first = defs[0] as vscode.Location & vscode.LocationLink;
+    const targetRange = (first.targetRange ?? (first as vscode.Location).range);
+    // The set-location is the addString("MQ_MESSAGE_INCOMING.ID", ...) line.
+    const setLine = doc.positionAt(text.indexOf('.addString("MQ_MESSAGE_INCOMING.ID"')).line;
+    assert.strictEqual(targetRange.start.line, setLine);
+  });
 });

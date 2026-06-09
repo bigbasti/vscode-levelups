@@ -51,11 +51,32 @@ keys). When a key is defined in multiple files, VS Code shows a picker.
 punctuation, the property key, and the `:default` portion are colored
 distinctly.
 
-### 3. Liquibase SQL highlighting
+### 3. `@Qualifier` bean navigation
+Ctrl/Cmd-Click the bean name inside `@Qualifier("beanName")` to jump to the bean
+definition (a `@Bean` factory method or a `@Service`/`@Component`/etc. class
+registered under that name). Reuses the same bean index as `@PreAuthorize`.
+
+```java
+@Qualifier("tamTkg46NeLiItemWriter") ItemWriter<Foo> writer
+//          ^ Ctrl/Cmd-Click → @Bean ItemWriter<…> tamTkg46NeLiItemWriter()
+```
+
+### 4. Spring Batch job-parameter navigation
+Ctrl/Cmd-Click a key inside `@Value("#{jobParameters['KEY']}")` to jump to where
+the parameter is set via a `JobParametersBuilder` (`.addString`/`.addLong`/
+`.addDate`/`.addDouble`/`.addParameter`/`.addJobParameter("KEY", …)`). Dotted
+keys are supported; when a key is set in several places, VS Code shows a picker.
+
+```java
+@Value("#{jobParameters['MQ_MESSAGE_INCOMING.ID']}") String id
+//                       ^ Ctrl/Cmd-Click → .addString("MQ_MESSAGE_INCOMING.ID", …)
+```
+
+### 5. Liquibase SQL highlighting
 SQL embedded in Liquibase changelog XML (`<sql>...</sql>`) is highlighted as SQL
 via a TextMate grammar injection — zero runtime cost.
 
-### 4. Liquibase SQL execution
+### 6. Liquibase SQL execution
 Place the cursor inside a `<sql>` block and run **Levelups: Execute SQL Block**
 (or use the CodeLens above the block). The nearest SQL block is extracted, you
 pick a target from a QuickPick listing every profile in
@@ -70,7 +91,7 @@ relevant setting.
 > `SqlDriver` extension point in `src/liquibase/sqlExecution.ts`
 > (`interface SqlDriver { execute(sql, conn): Promise<SqlExecResult> }`).
 
-### 5. Liquibase file-reference navigation
+### 7. Liquibase file-reference navigation
 Ctrl/Cmd-click a path inside a changelog's `<include file="…">`,
 `<sqlFile path="…">`, or `<includeAll path="…">` to jump to the referenced file
 or directory. Paths are resolved relative to the current changelog when
@@ -84,6 +105,8 @@ tried. Only targets that exist on disk are linked.
 |---|---|---|
 | `vscodeLevelups.enablePreAuthorizeNavigation` | `true` | Navigation inside `@PreAuthorize` SpEL expressions. |
 | `vscodeLevelups.enableValueNavigation` | `true` | Navigation from `@Value` to property definitions. |
+| `vscodeLevelups.enableQualifierNavigation` | `true` | Navigation from `@Qualifier("bean")` to the bean definition. |
+| `vscodeLevelups.enableJobParameterNavigation` | `true` | Navigation from `@Value("#{jobParameters['KEY']}")` to where the job parameter is set. |
 | `vscodeLevelups.enableLiquibaseSqlExecution` | `true` | Allow executing SQL blocks from Liquibase XML. |
 | `vscodeLevelups.enableLiquibaseFileNavigation` | `true` | Navigation from `include`/`includeAll`/`sqlFile` references to the referenced files. |
 | `vscodeLevelups.sql.connections` | `[]` | SQL connection profiles (see below). |
