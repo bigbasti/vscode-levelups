@@ -1,0 +1,94 @@
+{
+  "name": "vscode-levelups",
+  "displayName": "VSCode Levelups",
+  "description": "Spring Boot navigation, property intelligence, and Liquibase tooling.",
+  "version": "0.0.1",
+  "publisher": "vscode-levelups",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Programming Languages", "Other"],
+  "activationEvents": [
+    "onLanguage:java",
+    "onLanguage:xml",
+    "workspaceContains:**/*.java"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscodeLevelups.executeSql",
+        "title": "Levelups: Execute SQL Block"
+      }
+    ],
+    "configuration": {
+      "title": "VSCode Levelups",
+      "properties": {
+        "vscodeLevelups.enablePreAuthorizeNavigation": {
+          "type": "boolean", "default": true,
+          "description": "Enable navigation inside Spring Security PreAuthorize expressions."
+        },
+        "vscodeLevelups.enableValueNavigation": {
+          "type": "boolean", "default": true,
+          "description": "Enable navigation from @Value expressions to property definitions."
+        },
+        "vscodeLevelups.enableLiquibaseSqlHighlighting": {
+          "type": "boolean", "default": true,
+          "description": "Enable SQL syntax highlighting inside Liquibase changelog XML files."
+        },
+        "vscodeLevelups.enableLiquibaseSqlExecution": {
+          "type": "boolean", "default": true,
+          "description": "Allow execution of SQL blocks from Liquibase changelog files."
+        },
+        "vscodeLevelups.sql.connections": {
+          "type": "array", "default": [],
+          "description": "SQL connection profiles for Liquibase SQL execution.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "jdbcUrl": { "type": "string" },
+              "username": { "type": "string" },
+              "password": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "grammars": [
+      {
+        "scopeName": "liquibase.sql.injection",
+        "path": "./syntaxes/liquibase-sql.tmLanguage.json",
+        "injectTo": ["text.xml"],
+        "embeddedLanguages": { "meta.embedded.block.sql": "sql" }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "package": "node esbuild.js --production",
+    "lint": "eslint src --ext ts",
+    "compile:tests": "tsc -p ./tsconfig.test.json",
+    "test:unit": "npm run compile:tests && mocha out/test/unit/**/*.test.js",
+    "test": "npm run compile:tests && node out/test/runIntegration.js",
+    "vsce:package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vscode/test-electron": "^2.3.9",
+    "esbuild": "^0.20.0",
+    "eslint": "^8.56.0",
+    "mocha": "^10.3.0",
+    "typescript": "^5.4.0"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^4.3.0",
+    "java-parser": "^2.3.0",
+    "node-sql-parser": "^4.18.0",
+    "yaml": "^2.4.0"
+  }
+}
