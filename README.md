@@ -17,12 +17,6 @@ standard VS Code "Go to Definition", a single command, an optional CodeLens, and
 an output channel. Everything is controlled through `settings.json`, and every
 feature is enabled by default.
 
-## Installation
-
-Install **VSCode Levelups** from the VS Code Marketplace (search for
-"VSCode Levelups" in the Extensions view), or build a `.vsix` locally with
-`npm run vsce:package` and install it via **Extensions: Install from VSIX…**.
-
 ## Features
 
 ### 1. Spring Security `@PreAuthorize` navigation
@@ -115,44 +109,6 @@ Connection profile shape:
 
 Each feature can be toggled independently at runtime; flipping a setting
 registers or disposes the relevant providers without a window reload.
-
-## Architecture
-
-```
-src/
-  extension.ts                 activation, indexing, feature registration
-  settings/settings.ts         typed config accessors
-  shared/                      logger, file watcher
-  java/                        workspace scanner, class/method/type resolvers
-  spring-security/             bean index, SpEL parser, PreAuthorize provider
-  spring-properties/           property index, YAML flattening, @Value provider
-  liquibase/                   detector, SQL extraction, execution, CodeLens, file refs
-syntaxes/liquibase-sql.tmLanguage.json  SQL grammar injection (Liquibase XML)
-syntaxes/spring-java.tmLanguage.json    @PreAuthorize / @Value grammar injection (Java)
-```
-
-Two cached indexes (beans, properties) are built once on activation and kept
-fresh incrementally via file system watchers — no full rescans on edits.
-
-Parsing is pure-JS (no native bindings): lightweight regex/line scanning is used
-for the location lookups, which keeps the extension reliable across VS Code
-versions and easy to test.
-
-## Build & Run
-
-```bash
-npm install          # install dependencies
-npm run compile      # bundle to dist/extension.js (esbuild)
-npm run watch        # incremental bundle
-npm run lint         # ESLint
-npm run test:unit    # Mocha unit tests (parsers, indexes, providers)
-npm test             # @vscode/test-electron integration tests
-npm run vsce:package # build a .vsix (requires @vscode/vsce)
-```
-
-Press **F5** in VS Code (Run Extension) to launch an Extension Development Host.
-Use the **Integration Tests** launch configuration to debug the integration
-suite.
 
 ## Compatibility
 
