@@ -28,7 +28,9 @@ export function defaultBeanName(className: string): string {
 }
 
 const STEREOTYPE_RE = new RegExp(
-  `@(${STEREOTYPES.join("|")})\\b(?:\\s*\\(\\s*(?:value\\s*=\\s*)?"([^"]+)"\\s*\\))?`
+  // Optional fully-qualified prefix (e.g. @org.springframework.stereotype.Service)
+  // via a non-capturing group so the capture indices below stay 1=name, 2=value.
+  `@(?:\\w+\\.)*(${STEREOTYPES.join("|")})\\b(?:\\s*\\(\\s*(?:value\\s*=\\s*)?"([^"]+)"\\s*\\))?`
 );
 const CLASS_RE = /\b(?:public\s+|final\s+|abstract\s+)*class\s+([A-Za-z_$][\w$]*)/;
 const ENUM_RE = /\b(?:public\s+)?enum\s+([A-Za-z_$][\w$]*)/;
