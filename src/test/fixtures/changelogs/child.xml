@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog">
+  <changeSet id="child-1" author="x">
+    <sql>INSERT INTO child(a) VALUES (1);</sql>
+  </changeSet>
+</databaseChangeLog>
