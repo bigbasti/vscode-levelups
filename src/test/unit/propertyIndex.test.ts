@@ -11,6 +11,19 @@ describe("flattenYaml", () => {
     assert.strictEqual(rd!.line, 1);
     assert.ok(entries.find((e) => e.key === "kks.inner.val"));
   });
+
+  it("indexes keys from every document in a multi-document file", () => {
+    const yaml = "a:\n  b: 1\n---\nc:\n  d: 2\n";
+    const entries = flattenYaml(yaml);
+    assert.ok(
+      entries.find((e) => e.key === "a.b"),
+      "first document key a.b should be present"
+    );
+    assert.ok(
+      entries.find((e) => e.key === "c.d"),
+      "second document key c.d should be present"
+    );
+  });
 });
 
 describe("PropertyIndex", () => {

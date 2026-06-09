@@ -1,4 +1,4 @@
-import { parseDocument, isMap, isScalar, isPair } from "yaml";
+import { parseAllDocuments, isMap, isPair } from "yaml";
 
 export interface YamlEntry {
   key: string;
@@ -7,10 +7,13 @@ export interface YamlEntry {
 }
 
 export function flattenYaml(text: string): YamlEntry[] {
-  const doc = parseDocument(text);
+  // Spring config files may bundle several profile documents separated by
+  // `---`; parse every document, not just the first.
+  const docs = parseAllDocuments(text);
   const entries: YamlEntry[] = [];
 
-  // Build a manual line index from offsets.
+  // Offsets are absolute across the whole text, so a single map serves every
+  // document.
   const offsetToPos = makeOffsetToPos(text);
 
   function walk(node: unknown, prefix: string): void {
@@ -35,8 +38,9 @@ export function flattenYaml(text: string): YamlEntry[] {
     }
   }
 
-  void isScalar;
-  walk(doc.contents, "");
+  for (const doc of docs) {
+    walk(doc.contents, "");
+  }
   return entries;
 }
 
