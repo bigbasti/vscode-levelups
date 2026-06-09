@@ -3,7 +3,25 @@
   "displayName": "VSCode Levelups",
   "description": "Spring Boot navigation, property intelligence, and Liquibase tooling.",
   "version": "0.0.1",
-  "publisher": "vscode-levelups",
+  "publisher": "SebastianGross",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bigbasti/vscode-levelups.git"
+  },
+  "author": {
+    "name": "Sebastian Gross",
+    "email": "bigbasti@outlook.com"
+  },
+  "icon": "media/levelups.png",
+  "keywords": [
+    "spring",
+    "spring boot",
+    "java",
+    "liquibase",
+    "preauthorize",
+    "navigation"
+  ],
   "engines": { "vscode": "^1.85.0" },
   "categories": ["Programming Languages", "Other"],
   "activationEvents": [
@@ -76,7 +94,8 @@
     "compile:tests": "tsc -p ./tsconfig.test.json",
     "test:unit": "npm run compile:tests && mocha out/test/unit/**/*.test.js",
     "test": "npm run compile:tests && node out/test/runIntegration.js",
-    "vsce:package": "vsce package"
+    "vsce:package": "vsce package --no-dependencies",
+    "vsce:publish": "vsce publish --no-dependencies"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",
@@ -85,6 +104,7 @@
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "@vscode/test-electron": "^2.3.9",
+    "@vscode/vsce": "^2.22.0",
     "esbuild": "^0.20.0",
     "eslint": "^8.56.0",
     "glob": "^10.5.0",
@@ -92,9 +112,6 @@
     "typescript": "^5.4.0"
   },
   "dependencies": {
-    "fast-xml-parser": "^4.3.0",
-    "java-parser": "^2.3.0",
-    "node-sql-parser": "^4.18.0",
     "yaml": "^2.4.0"
   }
 }

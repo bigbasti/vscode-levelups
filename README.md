@@ -1,4 +1,12 @@
-# VSCode Levelups
+<p align="center">
+  <img src="media/levelups.png" alt="VSCode Levelups" width="128" height="128" />
+</p>
+
+<h1 align="center">VSCode Levelups</h1>
+
+<p align="center">
+  Missing navigation, language intelligence, and Liquibase tooling for Java Spring Boot projects.
+</p>
 
 A VS Code extension that adds missing navigation, language intelligence, and
 Liquibase tooling for Java Spring Boot projects.
@@ -8,6 +16,12 @@ sidebars, webviews, or status bar items**. The only surfaces it uses are
 standard VS Code "Go to Definition", a single command, an optional CodeLens, and
 an output channel. Everything is controlled through `settings.json`, and every
 feature is enabled by default.
+
+## Installation
+
+Install **VSCode Levelups** from the VS Code Marketplace (search for
+"VSCode Levelups" in the Extensions view), or build a `.vsix` locally with
+`npm run vsce:package` and install it via **Extensions: Install from VSIX…**.
 
 ## Features
 
@@ -112,16 +126,17 @@ src/
   java/                        workspace scanner, class/method/type resolvers
   spring-security/             bean index, SpEL parser, PreAuthorize provider
   spring-properties/           property index, YAML flattening, @Value provider
-  liquibase/                   detector, SQL extraction, execution, CodeLens
-syntaxes/liquibase-sql.tmLanguage.json  SQL grammar injection
+  liquibase/                   detector, SQL extraction, execution, CodeLens, file refs
+syntaxes/liquibase-sql.tmLanguage.json  SQL grammar injection (Liquibase XML)
+syntaxes/spring-java.tmLanguage.json    @PreAuthorize / @Value grammar injection (Java)
 ```
 
 Two cached indexes (beans, properties) are built once on activation and kept
 fresh incrementally via file system watchers — no full rescans on edits.
 
-Parsing is pure-JS (no native bindings): `java-parser` is available, with
-lightweight regex/line scanning used for the location lookups. This keeps the
-extension reliable across VS Code versions and easy to test.
+Parsing is pure-JS (no native bindings): lightweight regex/line scanning is used
+for the location lookups, which keeps the extension reliable across VS Code
+versions and easy to test.
 
 ## Build & Run
 
@@ -144,3 +159,7 @@ suite.
 Works alongside the Java Extension Pack / Red Hat Java extension. Supports Maven,
 Gradle, multi-module, and multi-root workspaces. All providers are additive — VS
 Code merges their results with those from other extensions.
+
+## License
+
+[MIT](LICENSE) © Sebastian Gross
