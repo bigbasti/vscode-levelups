@@ -65,12 +65,12 @@ export async function activate(
     })
   );
 
-  registerFeatures(settings, beanIndex, propertyIndex, context);
+  registerFeatures(settings, beanIndex, propertyIndex);
 
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration("vscodeLevelups")) {
-        registerFeatures(settings, beanIndex, propertyIndex, context);
+        registerFeatures(settings, beanIndex, propertyIndex);
       }
     })
   );
@@ -79,8 +79,7 @@ export async function activate(
 function registerFeatures(
   settings: Settings,
   beanIndex: BeanIndex,
-  propertyIndex: PropertyIndex,
-  context: vscode.ExtensionContext
+  propertyIndex: PropertyIndex
 ): void {
   for (const d of featureDisposables) d.dispose();
   featureDisposables = [];
@@ -113,8 +112,12 @@ function registerFeatures(
       )
     );
   }
-
-  context.subscriptions.push(...featureDisposables);
+  // Note: featureDisposables are intentionally NOT pushed onto
+  // context.subscriptions. registerFeatures runs on every config change and
+  // manages this generation's disposables directly (disposing the previous set
+  // above); deactivate() disposes the final set. Pushing here would append a
+  // new, already-disposed generation to context.subscriptions on every config
+  // change, leaking them for the host lifetime.
 }
 
 async function buildBeanIndex(beanIndex: BeanIndex): Promise<void> {
