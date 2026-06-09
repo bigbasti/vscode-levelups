@@ -58,13 +58,22 @@ function detectBeanFactoryMethods(
 ): BeanInfo[] {
   const lines = source.split(/\r?\n/);
   const beans: BeanInfo[] = [];
+  const idRe = /\b([A-Za-z_$][\w$]*)\s*\(/g;
   for (let i = 0; i < lines.length; i++) {
     if (/@Bean\b/.test(lines[i])) {
-      // method declaration is on this or a following line
-      for (let j = i; j < Math.min(i + 3, lines.length); j++) {
-        const m = /\b([A-Za-z_$][\w$]*)\s*\(/.exec(lines[j]);
-        if (m && !/@Bean/.test(lines[j].slice(m.index))) {
+      // The method declaration is on this or a following line. Scan for the
+      // first real identifier-before-"(" while ignoring annotation tokens such
+      // as `@Bean(name = "...")`, whose `Bean(` would otherwise be picked up.
+      let found = false;
+      for (let j = i; j < Math.min(i + 3, lines.length) && !found; j++) {
+        idRe.lastIndex = 0;
+        let m: RegExpExecArray | null;
+        while ((m = idRe.exec(lines[j])) !== null) {
           const name = m[1];
+          // Skip an identifier that is the annotation itself (preceded by "@")
+          // or a well-known annotation name.
+          if (m.index > 0 && lines[j][m.index - 1] === "@") continue;
+          if (name === "Bean" || name === "Configuration") continue;
           const method: MethodInfo = {
             name,
             filePath,
@@ -79,6 +88,7 @@ function detectBeanFactoryMethods(
             classColumn: method.column,
             methods: [method],
           });
+          found = true;
           break;
         }
       }

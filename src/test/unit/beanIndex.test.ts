@@ -12,6 +12,18 @@ public class Cfg {
   public UserService userService() { return null; }
 }
 `;
+const BEAN_FACTORY_NAMED = `@Configuration
+public class Cfg {
+  @Bean(name = "userService")
+  public UserService userService() { return null; }
+}
+`;
+const BEAN_FACTORY_VALUE = `@Configuration
+public class Cfg {
+  @Bean(value = "userService", initMethod = "init")
+  public UserService userService() { return null; }
+}
+`;
 
 describe("BeanIndex", () => {
   it("indexes stereotype beans and methods", () => {
@@ -27,6 +39,24 @@ describe("BeanIndex", () => {
     const idx = new BeanIndex();
     idx.updateFromSource("/p/Cfg.java", BEAN_FACTORY);
     assert.ok(idx.get("userService"));
+  });
+
+  it("indexes @Bean(name=...) by method name, not the annotation token", () => {
+    const idx = new BeanIndex();
+    idx.updateFromSource("/p/Cfg.java", BEAN_FACTORY_NAMED);
+    assert.ok(idx.get("userService"), "real bean method should be indexed");
+    assert.strictEqual(
+      idx.get("Bean"),
+      undefined,
+      "annotation token must not be indexed as a bean"
+    );
+  });
+
+  it("indexes @Bean(value=..., initMethod=...) by method name", () => {
+    const idx = new BeanIndex();
+    idx.updateFromSource("/p/Cfg.java", BEAN_FACTORY_VALUE);
+    assert.ok(idx.get("userService"), "real bean method should be indexed");
+    assert.strictEqual(idx.get("Bean"), undefined);
   });
 
   it("removes entries for a deleted file", () => {
