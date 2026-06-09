@@ -35,14 +35,14 @@ export type ConnectionPicker = (
 /**
  * Decide which connection to use. Pure logic with no vscode dependency: the
  * prompt callback is injected so the prompting strategy (and its vscode usage)
- * stays out of this function.
+ * stays out of this function. The user always selects from the configured
+ * connections so the active target is explicit.
  */
 export async function pickConnection(
   conns: SqlConnection[],
   prompt: ConnectionPicker
 ): Promise<SqlConnection | undefined> {
   if (conns.length === 0) return undefined;
-  if (conns.length === 1) return conns[0];
   return prompt(conns);
 }
 
@@ -53,11 +53,16 @@ async function defaultPrompt(
   // here to keep this module loadable in plain Node unit tests.
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const vs: typeof import("vscode") = require("vscode");
-  const choice = await vs.window.showQuickPick(
-    conns.map((c) => c.name),
-    { placeHolder: "Select SQL connection" }
-  );
-  return conns.find((c) => c.name === choice);
+  const items = conns.map((c) => ({
+    label: c.name,
+    description: c.jdbcUrl,
+    connection: c,
+  }));
+  const choice = await vs.window.showQuickPick(items, {
+    placeHolder: "Select a SQL connection to execute against",
+    matchOnDescription: true,
+  });
+  return choice?.connection;
 }
 
 export interface ExecuteSqlDeps {
@@ -94,14 +99,24 @@ export async function executeSqlCommand(
     return;
   }
 
-  const conn = await pickConnection(
-    deps.getConnections(),
-    deps.prompt ?? defaultPrompt
-  );
-  if (!conn) {
-    vs.window.showWarningMessage(
-      "No SQL connection configured (vscodeLevelups.sql.connections)."
+  const connections = deps.getConnections();
+  if (connections.length === 0) {
+    const action = await vs.window.showWarningMessage(
+      "No SQL connection configured. Add one under vscodeLevelups.sql.connections.",
+      "Open Settings"
     );
+    if (action === "Open Settings") {
+      await vs.commands.executeCommand(
+        "workbench.action.openSettings",
+        "vscodeLevelups.sql.connections"
+      );
+    }
+    return;
+  }
+
+  const conn = await pickConnection(connections, deps.prompt ?? defaultPrompt);
+  if (!conn) {
+    // User dismissed the picker; nothing to do.
     return;
   }
 

@@ -16,11 +16,14 @@ describe("MockSqlDriver", () => {
 });
 
 describe("pickConnection", () => {
-  it("returns the only connection without prompting", async () => {
+  it("prompts even when only one connection exists", async () => {
     const conn = { name: "DEV", jdbcUrl: "j", username: "u", password: "p" };
-    const chosen = await pickConnection([conn], async () => {
-      throw new Error("should not prompt");
+    let prompted = false;
+    const chosen = await pickConnection([conn], async (conns) => {
+      prompted = true;
+      return conns[0];
     });
+    assert.strictEqual(prompted, true);
     assert.strictEqual(chosen, conn);
   });
 
@@ -31,8 +34,19 @@ describe("pickConnection", () => {
     assert.strictEqual(chosen, b);
   });
 
-  it("returns undefined when no connections", async () => {
-    const chosen = await pickConnection([], async () => undefined);
+  it("returns undefined when the user dismisses the picker", async () => {
+    const conn = { name: "DEV", jdbcUrl: "j", username: "u", password: "p" };
+    const chosen = await pickConnection([conn], async () => undefined);
+    assert.strictEqual(chosen, undefined);
+  });
+
+  it("returns undefined without prompting when no connections", async () => {
+    let prompted = false;
+    const chosen = await pickConnection([], async () => {
+      prompted = true;
+      return undefined;
+    });
+    assert.strictEqual(prompted, false);
     assert.strictEqual(chosen, undefined);
   });
 });

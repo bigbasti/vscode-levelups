@@ -22,6 +22,11 @@ Beans are discovered from `@Service`, `@Component`, `@Repository`,
 `@Controller`, `@RestController` (default and explicit names, including
 fully-qualified annotations) and from `@Bean` factory methods.
 
+SpEL expressions inside `@PreAuthorize` (and `@PostAuthorize`/`@PreFilter`/
+`@PostFilter`) are syntax-highlighted — beans, method calls, `T(...)` types,
+`#parameters`, logical operators and security functions are colored instead of
+appearing as plain string text.
+
 ### 2. Spring `@Value` property navigation
 Ctrl/Cmd-Click a property reference to jump to its declaration:
 
@@ -34,15 +39,22 @@ Indexed sources: `application*.properties`, `bootstrap*.properties`, and
 `application*/bootstrap*.{yml,yaml}` (nested YAML keys are flattened to dotted
 keys). When a key is defined in multiple files, VS Code shows a picker.
 
+`${...}` placeholders inside `@Value` are syntax-highlighted: the placeholder
+punctuation, the property key, and the `:default` portion are colored
+distinctly.
+
 ### 3. Liquibase SQL highlighting
 SQL embedded in Liquibase changelog XML (`<sql>...</sql>`) is highlighted as SQL
 via a TextMate grammar injection — zero runtime cost.
 
 ### 4. Liquibase SQL execution
 Place the cursor inside a `<sql>` block and run **Levelups: Execute SQL Block**
-(or use the CodeLens above the block). The nearest SQL block is extracted and
-run through a connection profile; results are written to the
-**VSCode Levelups** output channel.
+(or use the CodeLens above the block). The nearest SQL block is extracted, you
+pick a target from a QuickPick listing every profile in
+`vscodeLevelups.sql.connections` (shown as name + JDBC URL), and the SQL runs
+against the selected connection; results are written to the **VSCode Levelups**
+output channel. If no connections are configured, a prompt offers to open the
+relevant setting.
 
 > SQL execution ships with a built-in **mock driver** that simulates execution
 > and reports affected rows. Real database drivers are intentionally not
