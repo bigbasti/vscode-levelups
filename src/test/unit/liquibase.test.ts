@@ -28,6 +28,19 @@ describe("findEnclosingSqlBlock", () => {
     assert.ok(block);
     assert.ok(block!.sql.includes("INSERT INTO t(a) VALUES (1);"));
   });
+  it("returns the block when offset is on the opening <sql> tag", () => {
+    // The CodeLens passes the position of the '<' of '<sql>'.
+    const offset = CHANGELOG.indexOf("<sql>");
+    const block = findEnclosingSqlBlock(CHANGELOG, offset);
+    assert.ok(block);
+    assert.ok(block!.sql.includes("INSERT INTO t(a) VALUES (1);"));
+  });
+  it("returns the block when offset is on the closing </sql> tag", () => {
+    const offset = CHANGELOG.indexOf("</sql>");
+    const block = findEnclosingSqlBlock(CHANGELOG, offset);
+    assert.ok(block);
+    assert.ok(block!.sql.includes("INSERT INTO t(a) VALUES (1);"));
+  });
   it("returns undefined when offset is outside any <sql>", () => {
     const offset = CHANGELOG.indexOf("changeSet");
     assert.strictEqual(findEnclosingSqlBlock(CHANGELOG, offset), undefined);
