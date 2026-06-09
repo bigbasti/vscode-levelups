@@ -1,0 +1,23 @@
+{
+  "scopeName": "liquibase.sql.injection",
+  "injectionSelector": "L:text.xml -comment -string",
+  "patterns": [{ "include": "#sql-block" }],
+  "repository": {
+    "sql-block": {
+      "begin": "(<)(sql)(>)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.xml" },
+        "2": { "name": "entity.name.tag.xml" },
+        "3": { "name": "punctuation.definition.tag.xml" }
+      },
+      "end": "(</)(sql)(>)",
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.xml" },
+        "2": { "name": "entity.name.tag.xml" },
+        "3": { "name": "punctuation.definition.tag.xml" }
+      },
+      "contentName": "meta.embedded.block.sql",
+      "patterns": [{ "include": "source.sql" }]
+    }
+  }
+}
