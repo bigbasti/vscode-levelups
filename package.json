@@ -2,7 +2,7 @@
   "name": "vscode-levelups",
   "displayName": "VSCode Levelups",
   "description": "Spring Boot navigation, property intelligence, and Liquibase tooling.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "SebastianGross",
   "license": "MIT",
   "repository": {

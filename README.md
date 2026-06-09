@@ -17,6 +17,20 @@ standard VS Code "Go to Definition", a single command, an optional CodeLens, and
 an output channel. Everything is controlled through `settings.json`, and every
 feature is enabled by default.
 
+## At a glance
+
+- **Navigate** (Ctrl/Cmd-Click → Go to Definition):
+  - `@PreAuthorize` SpEL → beans, methods, `T(pkg.Class)` types
+  - `@Value("${property}")` → the property declaration
+  - `@Qualifier("bean")` → the bean definition
+  - `@Value("#{jobParameters['KEY']}")` → where the Spring Batch param is set
+  - Liquibase `<include>` / `<includeAll>` / `<sqlFile>` → the referenced file
+- **Highlight** (TextMate grammar injection, zero runtime cost):
+  - SpEL in `@PreAuthorize` and `${…}` in `@Value`
+  - SQL in Liquibase `<sql>` blocks
+  - JPQL/SQL in Spring Data `@Query(…)`
+- **Run**: execute a Liquibase `<sql>` block against a configured connection.
+
 ## Features
 
 ### 1. Spring Security `@PreAuthorize` navigation
@@ -29,6 +43,14 @@ Ctrl/Cmd-Click inside SpEL expressions to jump to the referenced code:
 Beans are discovered from `@Service`, `@Component`, `@Repository`,
 `@Controller`, `@RestController` (default and explicit names, including
 fully-qualified annotations) and from `@Bean` factory methods.
+
+```java
+@PreAuthorize("@lptUserDetailService.userHasGroup(#id) or " +
+              "hasRole(T(de.telekom.lpt.model.UserGroup).ADMIN)")
+public void update(Long id) { … }
+//  Ctrl/Cmd-Click: lptUserDetailService → the @Service class,
+//  userHasGroup → the method, UserGroup → the enum.
+```
 
 SpEL expressions inside `@PreAuthorize` (and `@PostAuthorize`/`@PreFilter`/
 `@PostFilter`) are syntax-highlighted — beans, method calls, `T(...)` types,
@@ -68,13 +90,31 @@ the parameter is set via a `JobParametersBuilder` (`.addString`/`.addLong`/
 keys are supported; when a key is set in several places, VS Code shows a picker.
 
 ```java
+// Usage site — Ctrl/Cmd-Click the key:
 @Value("#{jobParameters['MQ_MESSAGE_INCOMING.ID']}") String id
-//                       ^ Ctrl/Cmd-Click → .addString("MQ_MESSAGE_INCOMING.ID", …)
+
+// …jumps to the definition site:
+new JobParametersBuilder()
+    .addString("MQ_MESSAGE_INCOMING.ID", messageId)   // ← navigates here
+    .addLong("chunk", 100L)
+    .toJobParameters();
 ```
 
 ### 5. Liquibase SQL highlighting
-SQL embedded in Liquibase changelog XML (`<sql>...</sql>`) is highlighted as SQL
-via a TextMate grammar injection — zero runtime cost.
+SQL embedded in Liquibase changelog XML is highlighted as SQL instead of plain
+XML text, including SQL inside `<rollback>` and `<sql>` tags that carry
+attributes. Delivered via a TextMate grammar injection — zero runtime cost.
+
+```xml
+<changeSet id="1" author="me">
+  <sql dbms="oracle">
+    INSERT INTO customer (id, name) VALUES (1, 'ACME');   <!-- highlighted as SQL -->
+  </sql>
+  <rollback>
+    <sql>DELETE FROM customer WHERE id = 1;</sql>
+  </rollback>
+</changeSet>
+```
 
 ### 6. Liquibase SQL execution
 Place the cursor inside a `<sql>` block and run **Levelups: Execute SQL Block**
@@ -97,7 +137,17 @@ Ctrl/Cmd-click a path inside a changelog's `<include file="…">`,
 or directory. Paths are resolved relative to the current changelog when
 `relativeToChangelogFile="true"`; otherwise common resource roots
 (`src/main/resources`, `src/test/resources`) and the workspace folders are also
-tried. Only targets that exist on disk are linked.
+tried. Only targets that exist on disk are linked, and the whole path is
+underlined as a single link.
+
+```xml
+<databaseChangeLog>
+  <!-- Ctrl/Cmd-Click the path to open the referenced changelog: -->
+  <include file="changelog/db.lpt-main-26.02.00.19.xml" relativeToChangelogFile="true"/>
+  <includeAll path="changelog/parts"/>
+  <sqlFile path="sql/seed.sql"/>
+</databaseChangeLog>
+```
 
 ### 8. SQL highlighting in `@Query` (Spring Data JPA)
 JPQL/SQL inside `@Query("…")` is syntax-highlighted instead of appearing as
@@ -105,6 +155,24 @@ plain string text — including `@Query(value = "…", nativeQuery = true)`,
 concatenated multi-line strings, and Java text blocks (`"""…"""`). Delivered via
 TextMate grammar injection (zero runtime cost), so like the other highlighting
 it is always on and has no setting.
+
+```java
+// Single-line JPQL — keywords, identifiers and literals are colored:
+@Query("SELECT i FROM ZebraTmpMqMessageIncoming i WHERE i.messageId = :messageId")
+Optional<ZebraTmpMqMessageIncoming> findByMessageId(@Param("messageId") String messageId);
+
+// Native SQL:
+@Query(value = "SELECT * FROM mq_message_incoming WHERE id = :id", nativeQuery = true)
+Optional<ZebraTmpMqMessageIncoming> findNative(@Param("id") BigInteger id);
+
+// Multi-line via a Java text block:
+@Query("""
+        SELECT i FROM ZebraTmpMqMessageIncoming i
+        WHERE i.status = :status
+        ORDER BY i.createdAt DESC
+        """)
+Page<ZebraTmpMqMessageIncoming> findByStatus(@Param("status") String status, Pageable pageable);
+```
 
 ## Settings
 
