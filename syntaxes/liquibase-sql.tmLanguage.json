@@ -4,11 +4,12 @@
   "patterns": [{ "include": "#sql-block" }],
   "repository": {
     "sql-block": {
-      "begin": "(<)(sql)(>)",
+      "begin": "(<)(sql)(\\b[^>]*)?(>)",
       "beginCaptures": {
         "1": { "name": "punctuation.definition.tag.xml" },
         "2": { "name": "entity.name.tag.xml" },
-        "3": { "name": "punctuation.definition.tag.xml" }
+        "3": { "name": "meta.tag.attributes.xml" },
+        "4": { "name": "punctuation.definition.tag.xml" }
       },
       "end": "(</)(sql)(>)",
       "endCaptures": {
