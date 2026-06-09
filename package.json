@@ -55,6 +55,11 @@
         "path": "./syntaxes/liquibase-sql.tmLanguage.json",
         "injectTo": ["text.xml"],
         "embeddedLanguages": { "meta.embedded.block.sql": "sql" }
+      },
+      {
+        "scopeName": "spring.java.injection",
+        "path": "./syntaxes/spring-java.tmLanguage.json",
+        "injectTo": ["source.java"]
       }
     ]
   },

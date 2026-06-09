@@ -1,0 +1,135 @@
+{
+  "scopeName": "spring.java.injection",
+  "injectionSelector": "L:source.java -comment",
+  "patterns": [
+    { "include": "#preauthorize" },
+    { "include": "#value" }
+  ],
+  "repository": {
+    "preauthorize": {
+      "begin": "(@)(PreAuthorize|PostAuthorize|PreFilter|PostFilter)\\s*(\\()",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.annotation.java" },
+        "2": { "name": "storage.type.annotation.java" },
+        "3": { "name": "punctuation.definition.parameters.begin.bracket.round.java" }
+      },
+      "end": "(\\))",
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.parameters.end.bracket.round.java" }
+      },
+      "patterns": [{ "include": "#spel-string" }]
+    },
+    "spel-string": {
+      "name": "string.quoted.double.java",
+      "begin": "\"",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.string.begin.java" }
+      },
+      "end": "\"",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.string.end.java" }
+      },
+      "patterns": [{ "include": "#spel-tokens" }]
+    },
+    "spel-tokens": {
+      "patterns": [
+        {
+          "match": "\\b(T)\\s*(\\()\\s*([\\w.]+)\\s*(\\))",
+          "captures": {
+            "1": { "name": "keyword.operator.spel" },
+            "2": { "name": "punctuation.section.parens.begin.spel" },
+            "3": { "name": "entity.name.type.class.spel" },
+            "4": { "name": "punctuation.section.parens.end.spel" }
+          }
+        },
+        {
+          "match": "(@)([A-Za-z_$][\\w$]*)",
+          "captures": {
+            "1": { "name": "punctuation.definition.variable.spel" },
+            "2": { "name": "variable.other.bean.spel" }
+          }
+        },
+        {
+          "match": "(\\.)([A-Za-z_$][\\w$]*)(?=\\s*\\()",
+          "captures": {
+            "1": { "name": "punctuation.accessor.spel" },
+            "2": { "name": "entity.name.function.spel" }
+          }
+        },
+        {
+          "match": "(#)([A-Za-z_$][\\w$]*)",
+          "captures": {
+            "1": { "name": "punctuation.definition.variable.spel" },
+            "2": { "name": "variable.parameter.spel" }
+          }
+        },
+        {
+          "match": "\\b(and|or|not|true|false|null|instanceof|matches)\\b",
+          "name": "keyword.operator.logical.spel"
+        },
+        {
+          "match": "\\b(hasRole|hasAnyRole|hasAuthority|hasAnyAuthority|hasPermission|permitAll|denyAll|isAuthenticated|isAnonymous|isRememberMe|isFullyAuthenticated|principal|authentication)\\b",
+          "name": "support.function.spel"
+        },
+        {
+          "match": "'[^']*'",
+          "name": "string.quoted.single.spel"
+        },
+        {
+          "match": "\\b[0-9]+(?:\\.[0-9]+)?\\b",
+          "name": "constant.numeric.spel"
+        }
+      ]
+    },
+    "value": {
+      "begin": "(@)(Value)\\s*(\\()",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.annotation.java" },
+        "2": { "name": "storage.type.annotation.java" },
+        "3": { "name": "punctuation.definition.parameters.begin.bracket.round.java" }
+      },
+      "end": "(\\))",
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.parameters.end.bracket.round.java" }
+      },
+      "patterns": [{ "include": "#value-string" }]
+    },
+    "value-string": {
+      "name": "string.quoted.double.java",
+      "begin": "\"",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.string.begin.java" }
+      },
+      "end": "\"",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.string.end.java" }
+      },
+      "patterns": [{ "include": "#placeholder" }]
+    },
+    "placeholder": {
+      "name": "meta.embedded.placeholder.spring",
+      "begin": "(\\$\\{)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.template-expression.begin.spring" }
+      },
+      "end": "(\\})",
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.template-expression.end.spring" }
+      },
+      "patterns": [
+        {
+          "match": "([^:}]+)(:)([^}]*)",
+          "captures": {
+            "1": { "name": "variable.other.property.spring" },
+            "2": { "name": "punctuation.separator.default.spring" },
+            "3": { "name": "string.unquoted.default.spring" }
+          }
+        },
+        {
+          "match": "[^:}]+",
+          "name": "variable.other.property.spring"
+        }
+      ]
+    }
+  }
+}
