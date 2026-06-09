@@ -56,9 +56,12 @@ run through a connection profile; results are written to the
 |---|---|---|
 | `vscodeLevelups.enablePreAuthorizeNavigation` | `true` | Navigation inside `@PreAuthorize` SpEL expressions. |
 | `vscodeLevelups.enableValueNavigation` | `true` | Navigation from `@Value` to property definitions. |
-| `vscodeLevelups.enableLiquibaseSqlHighlighting` | `true` | SQL highlighting inside Liquibase XML. |
 | `vscodeLevelups.enableLiquibaseSqlExecution` | `true` | Allow executing SQL blocks from Liquibase XML. |
 | `vscodeLevelups.sql.connections` | `[]` | SQL connection profiles (see below). |
+
+Liquibase SQL highlighting is always on. It is delivered through a static
+TextMate grammar injection contributed in `package.json`, which has zero runtime
+cost and cannot be toggled at runtime, so it has no setting.
 
 Connection profile shape:
 

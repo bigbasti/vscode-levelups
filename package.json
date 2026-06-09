@@ -30,10 +30,6 @@
           "type": "boolean", "default": true,
           "description": "Enable navigation from @Value expressions to property definitions."
         },
-        "vscodeLevelups.enableLiquibaseSqlHighlighting": {
-          "type": "boolean", "default": true,
-          "description": "Enable SQL syntax highlighting inside Liquibase changelog XML files."
-        },
         "vscodeLevelups.enableLiquibaseSqlExecution": {
           "type": "boolean", "default": true,
           "description": "Allow execution of SQL blocks from Liquibase changelog files."

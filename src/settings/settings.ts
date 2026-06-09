@@ -14,7 +14,6 @@ export type ConfigProvider = () => ConfigLike;
 const SECTION_KEYS = {
   preAuth: "enablePreAuthorizeNavigation",
   value: "enableValueNavigation",
-  highlight: "enableLiquibaseSqlHighlighting",
   exec: "enableLiquibaseSqlExecution",
   conns: "sql.connections",
 } as const;
@@ -31,9 +30,6 @@ export class Settings {
   }
   get enableValueNavigation(): boolean {
     return this.cfg().get(SECTION_KEYS.value, true);
-  }
-  get enableLiquibaseSqlHighlighting(): boolean {
-    return this.cfg().get(SECTION_KEYS.highlight, true);
   }
   get enableLiquibaseSqlExecution(): boolean {
     return this.cfg().get(SECTION_KEYS.exec, true);

@@ -15,7 +15,6 @@ describe("Settings", () => {
     const s = new Settings(() => fakeConfig({}) as any);
     assert.strictEqual(s.enablePreAuthorizeNavigation, true);
     assert.strictEqual(s.enableValueNavigation, true);
-    assert.strictEqual(s.enableLiquibaseSqlHighlighting, true);
     assert.strictEqual(s.enableLiquibaseSqlExecution, true);
     assert.deepStrictEqual(s.sqlConnections, []);
   });
