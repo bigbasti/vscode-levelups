@@ -66,7 +66,10 @@ export interface ExecuteSqlDeps {
   prompt?: ConnectionPicker;
 }
 
-export async function executeSqlCommand(deps: ExecuteSqlDeps): Promise<void> {
+export async function executeSqlCommand(
+  deps: ExecuteSqlDeps,
+  at?: { line: number; character: number }
+): Promise<void> {
   // vscode and the logger (which itself imports vscode) are required lazily so
   // that the rest of this module loads in unit tests where vscode is absent.
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -80,7 +83,11 @@ export async function executeSqlCommand(deps: ExecuteSqlDeps): Promise<void> {
     return;
   }
   const text = editor.document.getText();
-  const offset = editor.document.offsetAt(editor.selection.active);
+  // When invoked from a CodeLens, `at` carries the clicked block's start
+  // position; clicking a lens does not move the cursor, so prefer it. Fall back
+  // to the cursor position when the command is run from the palette.
+  const position = at ? new vs.Position(at.line, at.character) : editor.selection.active;
+  const offset = editor.document.offsetAt(position);
   const block = findEnclosingSqlBlock(text, offset);
   if (!block) {
     vs.window.showWarningMessage("Cursor is not inside a <sql> block.");

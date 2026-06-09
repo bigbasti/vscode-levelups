@@ -27,6 +27,7 @@ export class LiquibaseCodeLensProvider implements vscode.CodeLensProvider {
         new vs.CodeLens(new vs.Range(pos, pos), {
           title: "Execute SQL Block",
           command: "vscodeLevelups.executeSql",
+          arguments: [pos],
         })
       );
     }

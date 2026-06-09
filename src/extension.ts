@@ -50,19 +50,25 @@ export async function activate(
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("vscodeLevelups.executeSql", async () => {
-      const s = vscodeSettings();
-      if (!s.enableLiquibaseSqlExecution) {
-        vscode.window.showInformationMessage(
-          "Liquibase SQL execution is disabled in settings."
+    vscode.commands.registerCommand(
+      "vscodeLevelups.executeSql",
+      async (at?: vscode.Position) => {
+        const s = vscodeSettings();
+        if (!s.enableLiquibaseSqlExecution) {
+          vscode.window.showInformationMessage(
+            "Liquibase SQL execution is disabled in settings."
+          );
+          return;
+        }
+        await executeSqlCommand(
+          {
+            driver: new MockSqlDriver(),
+            getConnections: () => s.sqlConnections,
+          },
+          at ? { line: at.line, character: at.character } : undefined
         );
-        return;
       }
-      await executeSqlCommand({
-        driver: new MockSqlDriver(),
-        getConnections: () => s.sqlConnections,
-      });
-    })
+    )
   );
 
   registerFeatures(settings, beanIndex, propertyIndex);
