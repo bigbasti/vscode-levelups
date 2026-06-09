@@ -48,6 +48,14 @@
           "type": "boolean", "default": true,
           "description": "Enable navigation from @Value expressions to property definitions."
         },
+        "vscodeLevelups.enableQualifierNavigation": {
+          "type": "boolean", "default": true,
+          "description": "Enable navigation from @Qualifier(\"beanName\") references to the bean definition."
+        },
+        "vscodeLevelups.enableJobParameterNavigation": {
+          "type": "boolean", "default": true,
+          "description": "Enable navigation from @Value(\"#{jobParameters['KEY']}\") references to where the Spring Batch job parameter is set."
+        },
         "vscodeLevelups.enableLiquibaseSqlExecution": {
           "type": "boolean", "default": true,
           "description": "Allow execution of SQL blocks from Liquibase changelog files."

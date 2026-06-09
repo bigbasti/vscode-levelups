@@ -14,6 +14,8 @@ export type ConfigProvider = () => ConfigLike;
 const SECTION_KEYS = {
   preAuth: "enablePreAuthorizeNavigation",
   value: "enableValueNavigation",
+  qualifier: "enableQualifierNavigation",
+  jobParameter: "enableJobParameterNavigation",
   exec: "enableLiquibaseSqlExecution",
   fileNav: "enableLiquibaseFileNavigation",
   conns: "sql.connections",
@@ -31,6 +33,12 @@ export class Settings {
   }
   get enableValueNavigation(): boolean {
     return this.cfg().get(SECTION_KEYS.value, true);
+  }
+  get enableQualifierNavigation(): boolean {
+    return this.cfg().get(SECTION_KEYS.qualifier, true);
+  }
+  get enableJobParameterNavigation(): boolean {
+    return this.cfg().get(SECTION_KEYS.jobParameter, true);
   }
   get enableLiquibaseSqlExecution(): boolean {
     return this.cfg().get(SECTION_KEYS.exec, true);

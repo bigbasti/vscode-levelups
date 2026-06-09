@@ -14,6 +14,9 @@ import { ValueDefinitionProvider } from "./spring-properties/valueDefinitionProv
 import { MockSqlDriver, executeSqlCommand } from "./liquibase/sqlExecution";
 import { LiquibaseCodeLensProvider } from "./liquibase/liquibaseCodeLens";
 import { LiquibaseFileDefinitionProvider } from "./liquibase/liquibaseFileDefinitionProvider";
+import { JobParameterIndex } from "./spring-beans/jobParameterIndex";
+import { QualifierDefinitionProvider } from "./spring-beans/qualifierDefinitionProvider";
+import { JobParameterDefinitionProvider } from "./spring-beans/jobParameterDefinitionProvider";
 
 const JAVA_SELECTOR: vscode.DocumentSelector = { language: "java" };
 const XML_SELECTOR: vscode.DocumentSelector = { language: "xml" };
@@ -28,10 +31,11 @@ export async function activate(
   const settings = vscodeSettings();
   const beanIndex = new BeanIndex();
   const propertyIndex = new PropertyIndex();
+  const jobParameterIndex = new JobParameterIndex();
 
   logInfo("vscode-levelups activating");
 
-  await buildBeanIndex(beanIndex);
+  await buildBeanIndex(beanIndex, jobParameterIndex);
   await buildPropertyIndex(propertyIndex);
 
   context.subscriptions.push(
@@ -39,9 +43,13 @@ export async function activate(
       onChange: async (uri) => {
         const src = await readFile(uri);
         beanIndex.updateFromSource(uri.fsPath, src);
+        jobParameterIndex.updateFromSource(uri.fsPath, src);
         cacheTypesFromSource(uri.fsPath, src);
       },
-      onDelete: (uri) => beanIndex.removeFile(uri.fsPath),
+      onDelete: (uri) => {
+        beanIndex.removeFile(uri.fsPath);
+        jobParameterIndex.removeFile(uri.fsPath);
+      },
     }),
     createWatcher(PROPERTY_GLOB, {
       onChange: async (uri) =>
@@ -72,12 +80,12 @@ export async function activate(
     )
   );
 
-  registerFeatures(settings, beanIndex, propertyIndex);
+  registerFeatures(settings, beanIndex, propertyIndex, jobParameterIndex);
 
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration("vscodeLevelups")) {
-        registerFeatures(settings, beanIndex, propertyIndex);
+        registerFeatures(settings, beanIndex, propertyIndex, jobParameterIndex);
       }
     })
   );
@@ -86,7 +94,8 @@ export async function activate(
 function registerFeatures(
   settings: Settings,
   beanIndex: BeanIndex,
-  propertyIndex: PropertyIndex
+  propertyIndex: PropertyIndex,
+  jobParameterIndex: JobParameterIndex
 ): void {
   for (const d of featureDisposables) d.dispose();
   featureDisposables = [];
@@ -107,6 +116,24 @@ function registerFeatures(
       vscode.languages.registerDefinitionProvider(
         JAVA_SELECTOR,
         new ValueDefinitionProvider(propertyIndex)
+      )
+    );
+  }
+
+  if (settings.enableQualifierNavigation) {
+    featureDisposables.push(
+      vscode.languages.registerDefinitionProvider(
+        JAVA_SELECTOR,
+        new QualifierDefinitionProvider(beanIndex)
+      )
+    );
+  }
+
+  if (settings.enableJobParameterNavigation) {
+    featureDisposables.push(
+      vscode.languages.registerDefinitionProvider(
+        JAVA_SELECTOR,
+        new JobParameterDefinitionProvider(jobParameterIndex)
       )
     );
   }
@@ -136,11 +163,15 @@ function registerFeatures(
   // change, leaking them for the host lifetime.
 }
 
-async function buildBeanIndex(beanIndex: BeanIndex): Promise<void> {
+async function buildBeanIndex(
+  beanIndex: BeanIndex,
+  jobParameterIndex: JobParameterIndex
+): Promise<void> {
   const files = await findJavaFiles();
   for (const uri of files) {
     const src = await readFile(uri);
     beanIndex.updateFromSource(uri.fsPath, src);
+    jobParameterIndex.updateFromSource(uri.fsPath, src);
     cacheTypesFromSource(uri.fsPath, src);
   }
 }
