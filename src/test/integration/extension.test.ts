@@ -56,11 +56,13 @@ describe("Integration", () => {
       "vscode.executeDefinitionProvider",
       doc.uri,
       pos
-    )) as vscode.Location[];
+    )) as (vscode.Location | vscode.LocationLink)[];
     assert.ok(defs && defs.length >= 1, "expected a definition for the include");
+    const first = defs[0] as vscode.Location & vscode.LocationLink;
+    const targetPath = (first.targetUri ?? first.uri).fsPath;
     assert.ok(
-      defs[0].uri.fsPath.endsWith("changelogs/child.xml"),
-      `expected child.xml, got ${defs[0].uri.fsPath}`
+      targetPath.endsWith("changelogs/child.xml"),
+      `expected child.xml, got ${targetPath}`
     );
   });
 });

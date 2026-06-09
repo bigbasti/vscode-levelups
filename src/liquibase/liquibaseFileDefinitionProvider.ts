@@ -25,7 +25,7 @@ export class LiquibaseFileDefinitionProvider
   provideDefinition(
     document: vscode.TextDocument,
     position: vscode.Position
-  ): vscode.Definition | undefined {
+  ): vscode.LocationLink[] | undefined {
     // vscode is only available in the extension host, so it is required lazily
     // to keep this module loadable in plain Node unit tests.
     // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -48,6 +48,23 @@ export class LiquibaseFileDefinitionProvider
     const target = candidates.find((p) => this.exists(p));
     if (!target) return undefined;
 
-    return new vs.Location(vs.Uri.file(target), new vs.Position(0, 0));
+    // Return a LocationLink with an explicit originSelectionRange so the editor
+    // underlines the entire path value as one link. Without it, VS Code falls
+    // back to the XML word pattern and underlines only the word fragment under
+    // the cursor (e.g. "19" in db.lpt-main-26.02.00.19.xml).
+    const originSelectionRange = new vs.Range(
+      document.positionAt(ref.valueStart),
+      document.positionAt(ref.valueEnd)
+    );
+    const targetUri = vs.Uri.file(target);
+    const targetRange = new vs.Range(0, 0, 0, 0);
+
+    return [
+      {
+        originSelectionRange,
+        targetUri,
+        targetRange,
+      },
+    ];
   }
 }
