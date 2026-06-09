@@ -34,6 +34,10 @@
           "type": "boolean", "default": true,
           "description": "Allow execution of SQL blocks from Liquibase changelog files."
         },
+        "vscodeLevelups.enableLiquibaseFileNavigation": {
+          "type": "boolean", "default": true,
+          "description": "Enable navigation from include/includeAll/sqlFile references in Liquibase changelogs to the referenced files."
+        },
         "vscodeLevelups.sql.connections": {
           "type": "array", "default": [],
           "description": "SQL connection profiles for Liquibase SQL execution.",

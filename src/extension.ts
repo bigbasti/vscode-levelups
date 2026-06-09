@@ -13,6 +13,7 @@ import { PropertyIndex } from "./spring-properties/propertyIndex";
 import { ValueDefinitionProvider } from "./spring-properties/valueDefinitionProvider";
 import { MockSqlDriver, executeSqlCommand } from "./liquibase/sqlExecution";
 import { LiquibaseCodeLensProvider } from "./liquibase/liquibaseCodeLens";
+import { LiquibaseFileDefinitionProvider } from "./liquibase/liquibaseFileDefinitionProvider";
 
 const JAVA_SELECTOR: vscode.DocumentSelector = { language: "java" };
 const XML_SELECTOR: vscode.DocumentSelector = { language: "xml" };
@@ -118,6 +119,15 @@ function registerFeatures(
       )
     );
   }
+
+  if (settings.enableLiquibaseFileNavigation) {
+    featureDisposables.push(
+      vscode.languages.registerDefinitionProvider(
+        XML_SELECTOR,
+        new LiquibaseFileDefinitionProvider(resourceRoots)
+      )
+    );
+  }
   // Note: featureDisposables are intentionally NOT pushed onto
   // context.subscriptions. registerFeatures runs on every config change and
   // manages this generation's disposables directly (disposing the previous set
@@ -153,6 +163,24 @@ async function buildPropertyIndex(propertyIndex: PropertyIndex): Promise<void> {
   for (const uri of files) {
     propertyIndex.updateFromSource(uri.fsPath, await readFile(uri));
   }
+}
+
+/**
+ * Candidate roots for resolving non-changelog-relative Liquibase references,
+ * mirroring how Liquibase resolves classpath paths: common Maven/Gradle
+ * resource directories plus each workspace folder root.
+ */
+function resourceRoots(): string[] {
+  const roots: string[] = [];
+  for (const folder of vscode.workspace.workspaceFolders ?? []) {
+    const base = folder.uri.fsPath;
+    roots.push(
+      vscode.Uri.joinPath(folder.uri, "src", "main", "resources").fsPath,
+      vscode.Uri.joinPath(folder.uri, "src", "test", "resources").fsPath,
+      base
+    );
+  }
+  return roots;
 }
 
 export function deactivate(): void {

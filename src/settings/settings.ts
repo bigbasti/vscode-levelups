@@ -15,6 +15,7 @@ const SECTION_KEYS = {
   preAuth: "enablePreAuthorizeNavigation",
   value: "enableValueNavigation",
   exec: "enableLiquibaseSqlExecution",
+  fileNav: "enableLiquibaseFileNavigation",
   conns: "sql.connections",
 } as const;
 
@@ -33,6 +34,9 @@ export class Settings {
   }
   get enableLiquibaseSqlExecution(): boolean {
     return this.cfg().get(SECTION_KEYS.exec, true);
+  }
+  get enableLiquibaseFileNavigation(): boolean {
+    return this.cfg().get(SECTION_KEYS.fileNav, true);
   }
   get sqlConnections(): SqlConnection[] {
     return this.cfg().get<SqlConnection[]>(SECTION_KEYS.conns, []);

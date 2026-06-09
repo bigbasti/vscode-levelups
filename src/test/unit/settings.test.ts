@@ -16,6 +16,7 @@ describe("Settings", () => {
     assert.strictEqual(s.enablePreAuthorizeNavigation, true);
     assert.strictEqual(s.enableValueNavigation, true);
     assert.strictEqual(s.enableLiquibaseSqlExecution, true);
+    assert.strictEqual(s.enableLiquibaseFileNavigation, true);
     assert.deepStrictEqual(s.sqlConnections, []);
   });
 

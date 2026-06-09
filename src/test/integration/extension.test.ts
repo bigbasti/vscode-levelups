@@ -46,4 +46,21 @@ describe("Integration", () => {
     assert.ok(defs && defs.length >= 1);
     assert.ok(defs[0].uri.fsPath.endsWith("application.properties"));
   });
+
+  it("navigates a Liquibase <include file> to the referenced file", async () => {
+    const doc = await openFixture("master.xml");
+    const text = doc.getText();
+    const offset = text.indexOf("changelogs/child.xml");
+    const pos = doc.positionAt(offset);
+    const defs = (await vscode.commands.executeCommand(
+      "vscode.executeDefinitionProvider",
+      doc.uri,
+      pos
+    )) as vscode.Location[];
+    assert.ok(defs && defs.length >= 1, "expected a definition for the include");
+    assert.ok(
+      defs[0].uri.fsPath.endsWith("changelogs/child.xml"),
+      `expected child.xml, got ${defs[0].uri.fsPath}`
+    );
+  });
 });

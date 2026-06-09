@@ -62,6 +62,14 @@ relevant setting.
 > `SqlDriver` extension point in `src/liquibase/sqlExecution.ts`
 > (`interface SqlDriver { execute(sql, conn): Promise<SqlExecResult> }`).
 
+### 5. Liquibase file-reference navigation
+Ctrl/Cmd-click a path inside a changelog's `<include file="…">`,
+`<sqlFile path="…">`, or `<includeAll path="…">` to jump to the referenced file
+or directory. Paths are resolved relative to the current changelog when
+`relativeToChangelogFile="true"`; otherwise common resource roots
+(`src/main/resources`, `src/test/resources`) and the workspace folders are also
+tried. Only targets that exist on disk are linked.
+
 ## Settings
 
 | Setting | Default | Description |
@@ -69,6 +77,7 @@ relevant setting.
 | `vscodeLevelups.enablePreAuthorizeNavigation` | `true` | Navigation inside `@PreAuthorize` SpEL expressions. |
 | `vscodeLevelups.enableValueNavigation` | `true` | Navigation from `@Value` to property definitions. |
 | `vscodeLevelups.enableLiquibaseSqlExecution` | `true` | Allow executing SQL blocks from Liquibase XML. |
+| `vscodeLevelups.enableLiquibaseFileNavigation` | `true` | Navigation from `include`/`includeAll`/`sqlFile` references to the referenced files. |
 | `vscodeLevelups.sql.connections` | `[]` | SQL connection profiles (see below). |
 
 Liquibase SQL highlighting is always on. It is delivered through a static
