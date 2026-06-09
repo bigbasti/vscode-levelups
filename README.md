@@ -99,6 +99,13 @@ or directory. Paths are resolved relative to the current changelog when
 (`src/main/resources`, `src/test/resources`) and the workspace folders are also
 tried. Only targets that exist on disk are linked.
 
+### 8. SQL highlighting in `@Query` (Spring Data JPA)
+JPQL/SQL inside `@Query("…")` is syntax-highlighted instead of appearing as
+plain string text — including `@Query(value = "…", nativeQuery = true)`,
+concatenated multi-line strings, and Java text blocks (`"""…"""`). Delivered via
+TextMate grammar injection (zero runtime cost), so like the other highlighting
+it is always on and has no setting.
+
 ## Settings
 
 | Setting | Default | Description |

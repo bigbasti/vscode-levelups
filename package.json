@@ -2,7 +2,7 @@
   "name": "vscode-levelups",
   "displayName": "VSCode Levelups",
   "description": "Spring Boot navigation, property intelligence, and Liquibase tooling.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "SebastianGross",
   "license": "MIT",
   "repository": {
@@ -89,7 +89,8 @@
       {
         "scopeName": "spring.java.injection",
         "path": "./syntaxes/spring-java.tmLanguage.json",
-        "injectTo": ["source.java"]
+        "injectTo": ["source.java"],
+        "embeddedLanguages": { "meta.embedded.block.sql": "sql" }
       }
     ]
   },

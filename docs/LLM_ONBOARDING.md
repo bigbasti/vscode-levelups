@@ -42,6 +42,9 @@ The guiding principle: behave as if VS Code natively supported these features.
 8. **Spring Batch job-parameter navigation** — Ctrl/Cmd-click a key in
    `@Value("#{jobParameters['KEY']}")` to jump to where it is set via a
    `JobParametersBuilder.addX("KEY", …)` call (`JobParameterIndex`).
+9. **SQL highlighting in `@Query`** — JPQL/SQL inside Spring Data `@Query("…")`
+   (incl. `nativeQuery`, concatenated strings, and `"""` text blocks) is
+   highlighted via grammar injection (`syntaxes/spring-java.tmLanguage.json`).
 
 ## 3. Tech stack & key decisions
 

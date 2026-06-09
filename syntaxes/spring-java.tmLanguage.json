@@ -3,7 +3,8 @@
   "injectionSelector": "L:source.java -comment",
   "patterns": [
     { "include": "#preauthorize" },
-    { "include": "#value" }
+    { "include": "#value" },
+    { "include": "#query" }
   ],
   "repository": {
     "preauthorize": {
@@ -129,6 +130,51 @@
           "match": "[^:}]+",
           "name": "variable.other.property.spring"
         }
+      ]
+    },
+    "query": {
+      "begin": "(@)(?:\\w+\\.)*(Query)\\s*(\\()",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.annotation.java" },
+        "2": { "name": "storage.type.annotation.java" },
+        "3": { "name": "punctuation.definition.parameters.begin.bracket.round.java" }
+      },
+      "end": "(\\))",
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.parameters.end.bracket.round.java" }
+      },
+      "patterns": [
+        { "include": "#query-textblock" },
+        { "include": "#query-string" }
+      ]
+    },
+    "query-textblock": {
+      "name": "string.quoted.triple.java",
+      "begin": "\"\"\"",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.string.begin.java" }
+      },
+      "end": "\"\"\"",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.string.end.java" }
+      },
+      "contentName": "meta.embedded.block.sql",
+      "patterns": [{ "include": "source.sql" }]
+    },
+    "query-string": {
+      "name": "string.quoted.double.java",
+      "begin": "\"",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.string.begin.java" }
+      },
+      "end": "\"",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.string.end.java" }
+      },
+      "contentName": "meta.embedded.block.sql",
+      "patterns": [
+        { "match": "\\\\.", "name": "constant.character.escape.java" },
+        { "include": "source.sql" }
       ]
     }
   }
