@@ -45,10 +45,10 @@ Beans are discovered from `@Service`, `@Component`, `@Repository`,
 fully-qualified annotations) and from `@Bean` factory methods.
 
 ```java
-@PreAuthorize("@lptUserDetailService.userHasGroup(#id) or " +
-              "hasRole(T(de.telekom.lpt.model.UserGroup).ADMIN)")
+@PreAuthorize("@UserDetailService.userHasGroup(#id) or " +
+              "hasRole(T(com.app.model.UserGroup).ADMIN)")
 public void update(Long id) { … }
-//  Ctrl/Cmd-Click: lptUserDetailService → the @Service class,
+//  Ctrl/Cmd-Click: UserDetailService → the @Service class,
 //  userHasGroup → the method, UserGroup → the enum.
 ```
 
@@ -79,8 +79,8 @@ definition (a `@Bean` factory method or a `@Service`/`@Component`/etc. class
 registered under that name). Reuses the same bean index as `@PreAuthorize`.
 
 ```java
-@Qualifier("tamTkg46NeLiItemWriter") ItemWriter<Foo> writer
-//          ^ Ctrl/Cmd-Click → @Bean ItemWriter<…> tamTkg46NeLiItemWriter()
+@Qualifier("myItemWriter") ItemWriter<Foo> writer
+//          ^ Ctrl/Cmd-Click → @Bean ItemWriter<…> myItemWriter()
 ```
 
 ### 4. Spring Batch job-parameter navigation
@@ -143,7 +143,7 @@ underlined as a single link.
 ```xml
 <databaseChangeLog>
   <!-- Ctrl/Cmd-Click the path to open the referenced changelog: -->
-  <include file="changelog/db.lpt-main-26.02.00.19.xml" relativeToChangelogFile="true"/>
+  <include file="changelog/db.-main-26.02.00.19.xml" relativeToChangelogFile="true"/>
   <includeAll path="changelog/parts"/>
   <sqlFile path="sql/seed.sql"/>
 </databaseChangeLog>
@@ -158,20 +158,20 @@ it is always on and has no setting.
 
 ```java
 // Single-line JPQL — keywords, identifiers and literals are colored:
-@Query("SELECT i FROM ZebraTmpMqMessageIncoming i WHERE i.messageId = :messageId")
-Optional<ZebraTmpMqMessageIncoming> findByMessageId(@Param("messageId") String messageId);
+@Query("SELECT i FROM TmpMqMessageIncoming i WHERE i.messageId = :messageId")
+Optional<TmpMqMessageIncoming> findByMessageId(@Param("messageId") String messageId);
 
 // Native SQL:
 @Query(value = "SELECT * FROM mq_message_incoming WHERE id = :id", nativeQuery = true)
-Optional<ZebraTmpMqMessageIncoming> findNative(@Param("id") BigInteger id);
+Optional<TmpMqMessageIncoming> findNative(@Param("id") BigInteger id);
 
 // Multi-line via a Java text block:
 @Query("""
-        SELECT i FROM ZebraTmpMqMessageIncoming i
+        SELECT i FROM TmpMqMessageIncoming i
         WHERE i.status = :status
         ORDER BY i.createdAt DESC
         """)
-Page<ZebraTmpMqMessageIncoming> findByStatus(@Param("status") String status, Pageable pageable);
+Page<TmpMqMessageIncoming> findByStatus(@Param("status") String status, Pageable pageable);
 ```
 
 ## Settings
